@@ -24,48 +24,41 @@ function [shear, bending, nodes, new_bending, total_lift] = shear_moment_v1(lift
     % Shear force is sum of all forces from tip to root (so integrate lift, as it is distributed)
 
     
+    % nodes.min_total = nodes.lift  ;
+    % nodes.max_total = nodes.lift  ;
+    
+    
     shear.lift = flip(cumtrapz(nodes.pos, flip(nodes.lift_per_m, 1)), 1); % finding the sum of lift at each point from tip to root
     nodes.lift = [0; shear.lift] - [shear.lift; 0]; % finding the difference between sum of lift at each node to find lift at each node
     nodes.lift(1) = [];
 
 
-    shear.wingbox_weight = - wingbox_mass .* const.g;
-    nodes.wingbox_weight = [0; shear.wingbox_weight] - [shear.wingbox_weight; 0]; % finding the difference between sum of lift at each node to find lift at each node
-    nodes.wingbox_weight(1) = [];
-    nodes.min_total = nodes.lift + nodes.wingbox_weight + nodes.min_point_loads;
-    nodes.max_total = nodes.lift + nodes.wingbox_weight + nodes.max_point_loads;
+    nodes.min_total = nodes.lift + nodes.wingbox_weight
+    nodes.max_total = 
     
 
     shear.lift = - shear.lift .* load_case;
     total_lift = - shear.lift(1,1);
 
-    
+    shear.wingbox_weight = - wingbox_mass .* const.g;
     shear.wingbox_weight = load_case .* - shear.wingbox_weight;
-
-    shear.min_point_loads = load_case .* - flip(cumsum(flip(nodes.min_point_loads,1)),1); 
-    shear.max_point_loads = load_case .* - flip(cumsum(flip(nodes.max_point_loads,1)),1);
-
-    shear.min_total = shear.lift + shear.min_point_loads + shear.wingbox_weight;
-    shear.max_total = shear.lift + shear.max_point_loads + shear.wingbox_weight;
-        
-        
     
     % load_case_no = 1;
-    % for load_case_no = 1:width(load_case)
-        % LEF = load_case(load_case_no);
+    for load_case_no = 1:width(load_case)
+        LEF = load_case(load_case_no);
 
-        % shear.min_point_loads(:, load_case_no) = LEF .* - flip(cumsum(flip(nodes.min_point_loads,1)),1); 
-        % shear.max_point_loads(:, load_case_no) = LEF .* - flip(cumsum(flip(nodes.max_point_loads,1)),1);
-        % 
+        shear.min_point_loads(:, load_case_no) = LEF .* - flip(cumsum(flip(nodes.min_point_loads,1)),1); 
+        shear.max_point_loads(:, load_case_no) = LEF .* - flip(cumsum(flip(nodes.max_point_loads,1)),1);
+        
         
         
         % shear.lift(:, load_case_no) = LEF .* - flip(cumsum(flip(nodes.lift, 1)), 1); % commented out so not going back and forth
         % between and maybe introducing extra rounding errors
 
-        % shear.min_total(:, load_case_no) = shear.lift(:, load_case_no) + shear.min_point_loads(:, load_case_no) + shear.wingbox_weight(:, load_case_no);
-        % shear.max_total(:, load_case_no) = shear.lift(:, load_case_no) + shear.max_point_loads(:, load_case_no) + shear.wingbox_weight(:, load_case_no);
-        % 
-    % end
+        shear.min_total(:, load_case_no) = shear.lift(:, load_case_no) + shear.min_point_loads(:, load_case_no) + shear.wingbox_weight(:, load_case_no);
+        shear.max_total(:, load_case_no) = shear.lift(:, load_case_no) + shear.max_point_loads(:, load_case_no) + shear.wingbox_weight(:, load_case_no);
+        
+    end
     %% Bending moment
     
     bending.lift = -flip(cumtrapz(nodes.pos, flip(shear.lift, 1)), 1);

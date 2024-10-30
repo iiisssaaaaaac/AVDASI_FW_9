@@ -13,7 +13,8 @@ function [wingbox_mass, wingbox_volume, total_mass, CS] = wingbox_weight_v1(wing
         geometry = geom_cs(CS, wingbox, span_pos);
         
         % Perform cross-sectional analysis to calculate area and moments of inertia
-        [CS(span_pos).Iyy, CS(span_pos).Izz, CS(span_pos).Centroid, CS(span_pos).area, ~, CS(span_pos).small_nodes, CS(span_pos).small_node_areas] = ...
+        [CS(span_pos).Iyy, CS(span_pos).Izz, CS(span_pos).Centroid, CS(span_pos).area, ~, CS(span_pos).small_nodes, ...
+            CS(span_pos).small_node_areas] = ...
             x_section_anal(geometry.nodes(:,2:3), geometry.connectivity, geometry.t, disc_density, 0);
     end
     

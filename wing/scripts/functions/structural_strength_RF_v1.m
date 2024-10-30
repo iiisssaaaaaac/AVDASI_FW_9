@@ -1,4 +1,4 @@
-function [RF, allowable, CS] = structural_strength_RF_v1(CS, const, stresses, wingbox, nSpan)
+function [RF, allowable, CS, RF_crit] = structural_strength_RF_v1(CS, const, stresses, wingbox, nSpan)
     % finding RFs for different failure modes given the material strength
     no_load_cases               = width(stresses(1).axial);
     disc_density                = 1000;
@@ -47,4 +47,5 @@ function [RF, allowable, CS] = structural_strength_RF_v1(CS, const, stresses, wi
     for load_case = 1:no_load_cases
         RF(:,:,load_case) = [RF_yield(:,load_case), RF_skin_panel_buckling(:,load_case), RF_plate_between_string(:,load_case), RF_string_plate(:,load_case)];
     end
+    RF_crit = min(RF,[],3);
 end

@@ -5,10 +5,9 @@ run NACA_632615  % aerofoil
 % run NACA_2412  % tip aerofoil
 
 %% interpolating data
-nStringer   = x.Stringer;
+nStringer         = x.Stringer;
 % WingSpan    = 10; % meters
 xSpan             = linspace(0,WingSpan,nSpan);
-element_length    = WingSpan/nSpan;
 Chord             = linspace(chord(1,:),chord(2,:),nSpan); % chord distribution along the span (m)
 BoxGeo            = interp1(x.BoxGeo(:,1),x.BoxGeo,xSpan/WingSpan);
 tSkin             = interp1(x.tSkin(:,1),x.tSkin,xSpan/WingSpan);
@@ -21,7 +20,7 @@ for i=1:nSpan
    CS(i).xSpan             = xSpan(i);             % position of the cross-section along the span (m)
    CS(i).Chord             = Chord(i);
    CS(i).beta              = xSpan(i)/WingSpan;    % interpolation coefficient
-   CS(i).ZYProfile_Norm    = NACA632615*(1-CS(i).beta) + NACA632615*CS(i).beta;
+   CS(i).ZYProfile_Norm    = NACA632615*(1-CS(i).beta) + NACA632615*CS(i).beta; % for blending between two airfoils (tip and root)
 
 
    CS(i).ZProfileOffset    = 0.5*(BoxGeo(i,2)+BoxGeo(i,3))*Chord(i);  % middle of the wing box along the chord
@@ -104,7 +103,7 @@ if PLOT
    set(gca, 'Ydir', 'reverse')
    axis equal
    MainAXES.Clipping = 'off';
-   plot3(xSpan,zeros(nSpan,1),zeros(nSpan,1),'red','LineWidth',2,'displayName','BeamAxis')
+   plot3(xSpan, zeros(nSpan,1), zeros(nSpan,1),'red','LineWidth',2,'displayName','BeamAxis')
 
    for ii=1:2 
       for i=1:nSpan
